@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ابدأ — خطتك الشخصية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #0F0F0F;
+  --white: #FAFAF8;
+  --green: #1A7A4A;
+  --green-light: #E8F5EE;
+  --green-mid: #2ECC71;
+  --gray: #6B6B6B;
+  --gray-light: #F0EFEB;
+  --border: #E2E0DA;
+  --red: #e74c3c;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  background: var(--white); color: var(--black);
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.25rem 2rem; border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-size: 20px; font-weight: 600; }
+.nav-logo span { color: var(--green); }
+.back-btn {
+  font-size: 13px; color: var(--gray); text-decoration: none;
+  display: flex; align-items: center; gap: 6px;
+}
+.back-btn:hover { color: var(--black); }
+
+/* PROGRESS */
+.progress-wrap { padding: 1.5rem 2rem 0; max-width: 600px; margin: 0 auto; width: 100%; }
+.progress-top { display: flex; justify-content: space-between; font-size: 12px; color: var(--gray); margin-bottom: 8px; }
+.progress-bar { height: 4px; background: var(--gray-light); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width .4s ease; }
+
+/* QUIZ */
+.quiz-wrap { flex: 1; max-width: 600px; margin: 0 auto; width: 100%; padding: 2.5rem 2rem; }
+.question { display: none; animation: fadeIn .3s ease; }
+.question.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.q-label { font-size: 12px; font-weight: 600; letter-spacing: 2px; color: var(--green); text-transform: uppercase; margin-bottom: .75rem; }
+.q-title { font-size: clamp(1.3rem, 3vw, 1.7rem); font-weight: 600; line-height: 1.3; margin-bottom: .5rem; letter-spacing: -.3px; }
+.q-sub { font-size: 14px; color: var(--gray); margin-bottom: 2rem; font-weight: 300; }
+
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option {
+  padding: 14px 18px; border: 1.5px solid var(--border);
+  border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 400;
+  transition: all .15s; display: flex; align-items: center; gap: 12px;
+  background: var(--white); color: var(--black); text-align: right;
+}
+.option:hover { border-color: var(--green); background: var(--green-light); }
+.option.selected { border-color: var(--green); background: var(--green-light); font-weight: 500; }
+.option-icon { font-size: 20px; flex-shrink: 0; }
+
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.text-input {
+  width: 100%; padding: 14px 18px;
+  border: 1.5px solid var(--border); border-radius: 12px;
+  font-size: 14px; font-family: inherit;
+  background: var(--white); color: var(--black);
+  outline: none; transition: border-color .2s;
+  direction: rtl; resize: none;
+}
+.text-input:focus { border-color: var(--green); }
+
+.nav-btns { display: flex; gap: 10px; margin-top: 2rem; justify-content: flex-end; }
+.btn-next {
+  padding: 12px 28px; background: var(--black); color: var(--white);
+  border: none; border-radius: 100px; font-size: 14px; font-weight: 500;
+  font-family: inherit; cursor: pointer; transition: opacity .2s;
+}
+.btn-next:hover { opacity: .8; }
+.btn-next:disabled { opacity: .4; cursor: not-allowed; }
+.btn-back {
+  padding: 12px 20px; background: transparent; color: var(--gray);
+  border: 1.5px solid var(--border); border-radius: 100px;
+  font-size: 14px; font-family: inherit; cursor: pointer;
+}
+.btn-back:hover { border-color: var(--black); color: var(--black); }
+
+/* LOADING */
+.loading-screen {
+  display: none; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 60vh; text-align: center;
+  padding: 2rem;
+}
+.loading-screen.active { display: flex; }
+.spinner {
+  width: 48px; height: 48px; border: 3px solid var(--gray-light);
+  border-top-color: var(--green); border-radius: 50%;
+  animation: spin 1s linear infinite; margin-bottom: 1.5rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 1.1rem; font-weight: 500; margin-bottom: .5rem; }
+.loading-sub { font-size: 14px; color: var(--gray); font-weight: 300; }
+.loading-steps { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 8px; }
+.loading-step {
+  font-size: 13px; color: var(--gray); padding: 8px 16px;
+  background: var(--gray-light); border-radius: 100px;
+  opacity: 0; transition: opacity .4s;
+}
+.loading-step.show { opacity: 1; }
+
+/* RESULT */
+.result-screen { display: none; max-width: 600px; margin: 0 auto; padding: 2rem; }
+.result-screen.active { display: block; }
+.result-header { text-align: center; margin-bottom: 2.5rem; }
+.result-badge {
+  display: inline-block; background: var(--green-light); color: var(--green);
+  font-size: 13px; font-weight: 600; padding: 5px 16px;
+  border-radius: 100px; margin-bottom: 1rem;
+}
+.result-header h2 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 600; letter-spacing: -.5px; line-height: 1.3; }
+.result-header p { font-size: 14px; color: var(--gray); margin-top: .75rem; font-weight: 300; }
+
+.plan-card {
+  border: 1.5px solid var(--border); border-radius: 16px;
+  padding: 1.5rem; margin-bottom: 1rem;
+}
+.plan-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+.plan-icon { font-size: 24px; }
+.plan-title { font-size: 15px; font-weight: 600; }
+.plan-sub { font-size: 12px; color: var(--gray); }
+.plan-steps { display: flex; flex-direction: column; gap: 8px; }
+.plan-step {
+  display: flex; gap: 10px; align-items: flex-start;
+  font-size: 13px; line-height: 1.6;
+}
+.plan-step-num {
+  width: 20px; height: 20px; background: var(--black); color: var(--white);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 600; flex-shrink: 0; margin-top: 2px;
+}
+.income-card {
+  background: var(--green); color: white; border-radius: 16px;
+  padding: 1.5rem; margin-bottom: 1rem; text-align: center;
+}
+.income-amount { font-size: 2.5rem; font-weight: 600; letter-spacing: -1px; }
+.income-label { font-size: 14px; opacity: .85; margin-top: 4px; }
+.income-time { font-size: 12px; opacity: .7; margin-top: 2px; }
+
+.result-cta {
+  width: 100%; padding: 14px; background: var(--black); color: var(--white);
+  border: none; border-radius: 100px; font-size: 15px; font-weight: 500;
+  font-family: inherit; cursor: pointer; margin-top: 1rem;
+  transition: opacity .2s;
+}
+.result-cta:hover { opacity: .8; }
+.result-share {
+  width: 100%; padding: 12px; background: transparent; color: var(--black);
+  border: 1.5px solid var(--border); border-radius: 100px;
+  font-size: 14px; font-family: inherit; cursor: pointer; margin-top: 10px;
+}
+.result-share:hover { border-color: var(--black); }
+
+.error-msg { color: var(--red); font-size: 13px; margin-top: 8px; display: none; }
+
+@media (max-width: 500px) {
+  .options-grid { grid-template-columns: 1fr; }
+  nav { padding: 1rem 1.25rem; }
+  .quiz-wrap, .result-screen { padding: 1.5rem 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">ا<span>ب</span>دأ</div>
+  <a href="index.html" class="back-btn">← الرئيسية</a>
+</nav>
+
+<div class="progress-wrap" id="progress-wrap">
+  <div class="progress-top">
+    <span id="q-counter">سؤال 1 من 7</span>
+    <span id="q-pct">14%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:14%"></div></div>
+</div>
+
+<!-- QUIZ -->
+<div class="quiz-wrap" id="quiz-wrap">
+
+  <!-- Q1 -->
+  <div class="question active" id="q1">
+    <div class="q-label">السؤال الأول</div>
+    <div class="q-title">شو اسمك؟</div>
+    <div class="q-sub">عشان نحكيلك بالاسم</div>
+    <input class="text-input" type="text" id="ans-name" placeholder="اسمك هون..." maxlength="30" />
+    <div class="nav-btns">
+      <button class="btn-next" onclick="next(1)">التالي →</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question" id="q2">
+    <div class="q-label">السؤال الثاني</div>
+    <div class="q-title">قديش عمرك؟</div>
+    <div class="q-sub">بيساعدنا نفهم وضعك أكتر</div>
+    <div class="options" id="opts-age">
+      <div class="option" onclick="select('age','15-20','opts-age')"><span class="option-icon">🧑</span>15 - 20 سنة</div>
+      <div class="option" onclick="select('age','21-25','opts-age')"><span class="option-icon">👨</span>21 - 25 سنة</div>
+      <div class="option" onclick="select('age','26-35','opts-age')"><span class="option-icon">🧔</span>26 - 35 سنة</div>
+      <div class="option" onclick="select('age','36+','opts-age')"><span class="option-icon">👴</span>36 سنة وأكتر</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="prev(2)">← رجوع</button>
+      <button class="btn-next" onclick="next(2)">التالي →</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question" id="q3">
+    <div class="q-label">السؤال الثالث</div>
+    <div class="q-title">شو وضعك هلق؟</div>
+    <div class="q-sub">بدنا نفهم من وين بتنطلق</div>
+    <div class="options" id="opts-status">
+      <div class="option" onclick="select('status','student','opts-status')"><span class="option-icon">📚</span>طالب / طالبة</div>
+      <div class="option" onclick="select('status','unemployed','opts-status')"><span class="option-icon">🔍</span>عم بدور على شغل</div>
+      <div class="option" onclick="select('status','employed','opts-status')"><span class="option-icon">💼</span>عندي شغل وبدي دخل إضافي</div>
+      <div class="option" onclick="select('status','free','opts-status')"><span class="option-icon">🌟</span>فري لانسر / أعمال حرة</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="prev(3)">← رجوع</button>
+      <button class="btn-next" onclick="next(3)">التالي →</button>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question" id="q4">
+    <div class="q-label">السؤال الرابع</div>
+    <div class="q-title">شو بتحب تعمل؟</div>
+    <div class="q-sub">اختار كل اللي ينطبق عليك</div>
+    <div class="options-grid" id="opts-skills">
+      <div class="option" onclick="toggleMulti('skills','writing',this)"><span class="option-icon">✍️</span>كتابة ومحتوى</div>
+      <div class="option" onclick="toggleMulti('skills','design',this)"><span class="option-icon">🎨</span>تصميم وإبداع</div>
+      <div class="option" onclick="toggleMulti('skills','tech',this)"><span class="option-icon">💻</span>تقنية وبرمجة</div>
+      <div class="option" onclick="toggleMulti('skills','social',this)"><span class="option-icon">📱</span>سوشيال ميديا</div>
+      <div class="option" onclick="toggleMulti('skills','teach',this)"><span class="option-icon">🎓</span>تعليم وشرح</div>
+      <div class="option" onclick="toggleMulti('skills','sales',this)"><span class="option-icon">🤝</span>مبيعات وتواصل</div>
+      <div class="option" onclick="toggleMulti('skills','translate',this)"><span class="option-icon">🌐</span>ترجمة ولغات</div>
+      <div class="option" onclick="toggleMulti('skills','nothing',this)"><span class="option-icon">🤷</span>ما بعرف بعد</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="prev(4)">← رجوع</button>
+      <button class="btn-next" onclick="next(4)">التالي →</button>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question" id="q5">
+    <div class="q-label">السؤال الخامس</div>
+    <div class="q-title">قديش وقتك الفاضي يومياً؟</div>
+    <div class="q-sub">بدون مبالغة — الصدق بساعدك</div>
+    <div class="options" id="opts-time">
+      <div class="option" onclick="select('time','30min','opts-time')"><span class="option-icon">⚡</span>أقل من ساعة</div>
+      <div class="option" onclick="select('time','1-2h','opts-time')"><span class="option-icon">🕐</span>1 - 2 ساعة</div>
+      <div class="option" onclick="select('time','2-4h','opts-time')"><span class="option-icon">🕑</span>2 - 4 ساعات</div>
+      <div class="option" onclick="select('time','4h+','opts-time')"><span class="option-icon">🕓</span>أكتر من 4 ساعات</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="prev(5)">← رجوع</button>
+      <button class="btn-next" onclick="next(5)">التالي →</button>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question" id="q6">
+    <div class="q-label">السؤال السادس</div>
+    <div class="q-title">شو ميزانيتك للبداية؟</div>
+    <div class="q-sub">في فرص لكل ميزانية</div>
+    <div class="options" id="opts-budget">
+      <div class="option" onclick="select('budget','zero','opts-budget')"><span class="option-icon">💸</span>صفر — ما عندي شي</div>
+      <div class="option" onclick="select('budget','low','opts-budget')"><span class="option-icon">💵</span>أقل من $50</div>
+      <div class="option" onclick="select('budget','mid','opts-budget')"><span class="option-icon">💰</span>$50 - $200</div>
+      <div class="option" onclick="select('budget','high','opts-budget')"><span class="option-icon">🏦</span>أكتر من $200</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="prev(6)">← رجوع</button>
+      <button class="btn-next" onclick="next(6)">التالي →</button>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question" id="q7">
+    <div class="q-label">السؤال الأخير</div>
+    <div class="q-title">شو هدفك من الدخل الأونلاين؟</div>
+    <div class="q-sub">حدد هدفك الحقيقي</div>
+    <div class="options" id="opts-goal">
+      <div class="option" onclick="select('goal','pocket','opts-goal')"><span class="option-icon">🎯</span>مصروف إضافي بسيط</div>
+      <div class="option" onclick="select('goal','replace','opts-goal')"><span class="option-icon">💼</span>بدل راتب ثابت</div>
+      <div class="option" onclick="select('goal','freedom','opts-goal')"><span class="option-icon">✈️</span>حرية مالية كاملة</div>
+      <div class="option" onclick="select('goal','business','opts-goal')"><span class="option-icon">🚀</span>بناء مشروع حقيقي</div>
+    </div>
+    <div class="error-msg" id="error-msg">اختار جواب عشان نكمل</div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="prev(7)">← رجوع</button>
+      <button class="btn-next" onclick="generatePlan()">🎯 ولّد خطتي</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loading-screen">
+  <div class="spinner"></div>
+  <div class="loading-text">الذكاء الاصطناعي يحلل وضعك...</div>
+  <div class="loading-sub">بنبني خطة شخصية خصيصاً إلك</div>
+  <div class="loading-steps">
+    <div class="loading-step" id="ls1">✓ تحليل مهاراتك واهتماماتك</div>
+    <div class="loading-step" id="ls2">✓ مقارنة مع أنجح الحالات المشابهة</div>
+    <div class="loading-step" id="ls3">✓ بناء خارطة طريق واقعية</div>
+    <div class="loading-step" id="ls4">✓ حساب الدخل المتوقع</div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="result-screen" id="result-screen">
+  <div class="result-header">
+    <div class="result-badge">✨ خطتك جاهزة</div>
+    <h2 id="result-title"></h2>
+    <p id="result-intro"></p>
+  </div>
+
+  <div class="income-card">
+    <div class="income-amount" id="result-income"></div>
+    <div class="income-label">دخل شهري متوقع بعد 60 يوم</div>
+    <div class="income-time" id="result-income-note"></div>
+  </div>
+
+  <div class="plan-card" id="plan-card-1"></div>
+  <div class="plan-card" id="plan-card-2"></div>
+  <div class="plan-card" id="plan-card-3"></div>
+
+  <button class="result-cta" onclick="alert('قريباً! المنصة الكاملة تحت البناء 🚀')">🚀 ابدأ الخطة هلق</button>
+  <button class="result-share" onclick="shareResult()">📤 شارك نتيجتك</button>
+</div>
+
+<script>
+const answers = { name:'', age:'', status:'', skills:[], time:'', budget:'', goal:'' };
+let currentQ = 1;
+const totalQ = 7;
+
+function updateProgress(q) {
+  const pct = Math.round((q / totalQ) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('q-counter').textContent = `سؤال ${q} من ${totalQ}`;
+  document.getElementById('q-pct').textContent = pct + '%';
+}
+
+function showQ(n) {
+  document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
+  document.getElementById('q' + n).classList.add('active');
+  updateProgress(n);
+  currentQ = n;
+}
+
+function select(key, val, groupId) {
+  answers[key] = val;
+  document.querySelectorAll('#' + groupId + ' .option').forEach(o => o.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+function toggleMulti(key, val, el) {
+  if (!answers[key]) answers[key] = [];
+  const idx = answers[key].indexOf(val);
+  if (idx > -1) { answers[key].splice(idx, 1); el.classList.remove('selected'); }
+  else { answers[key].push(val); el.classList.add('selected'); }
+}
+
+function next(q) {
+  if (q === 1) {
+    const name = document.getElementById('ans-name').value.trim();
+    if (!name) { document.getElementById('ans-name').focus(); document.getElementById('ans-name').style.borderColor = '#e74c3c'; return; }
+    document.getElementById('ans-name').style.borderColor = '#1A7A4A';
+    answers.name = name;
+  }
+  if (q === 2 && !answers.age) return;
+  if (q === 3 && !answers.status) return;
+  if (q === 4 && answers.skills.length === 0) return;
+  if (q === 5 && !answers.time) return;
+  if (q === 6 && !answers.budget) return;
+  showQ(q + 1);
+}
+
+function prev(q) { showQ(q - 1); }
+
+function generatePlan() {
+  if (!answers.goal) {
+    document.getElementById('error-msg').style.display = 'block';
+    return;
+  }
+  document.getElementById('quiz-wrap').style.display = 'none';
+  document.getElementById('progress-wrap').style.display = 'none';
+  document.getElementById('loading-screen').classList.add('active');
+
+  // Show loading steps
+  [1,2,3,4].forEach((n, i) => {
+    setTimeout(() => document.getElementById('ls'+n).classList.add('show'), i * 600);
+  });
+
+  // Call Claude API
+  setTimeout(() => callClaudeAPI(), 2800);
+}
+
+async function callClaudeAPI() {
+  const skillsMap = {
+    writing:'كتابة ومحتوى', design:'تصميم وإبداع', tech:'تقنية وبرمجة',
+    social:'سوشيال ميديا', teach:'تعليم وشرح', sales:'مبيعات وتواصل',
+    translate:'ترجمة ولغات', nothing:'لا يعرف بعد'
+  };
+  const skillsText = answers.skills.map(s => skillsMap[s] || s).join('، ');
+  const budgetMap = {zero:'صفر دولار', low:'أقل من $50', mid:'$50-200', high:'أكثر من $200'};
+  const timeMap = {'30min':'أقل من ساعة', '1-2h':'1-2 ساعة', '2-4h':'2-4 ساعات', '4h+':'أكثر من 4 ساعات'};
+  const goalMap = {pocket:'دخل إضافي بسيط', replace:'بديل للراتب', freedom:'حرية مالية', business:'بناء مشروع'};
+  const statusMap = {student:'طالب', unemployed:'يبحث عن عمل', employed:'موظف يريد دخلاً إضافياً', free:'فري لانسر'};
+
+  const prompt = `أنت مرشد خبير في ريادة الأعمال الرقمية للشباب العربي. بناءً على المعلومات التالية، ابنِ خطة عمل شخصية ودقيقة باللغة العربية.
+
+معلومات المستخدم:
+- الاسم: ${answers.name}
+- العمر: ${answers.age}
+- الوضع: ${statusMap[answers.status] || answers.status}
+- المهارات والاهتمامات: ${skillsText || 'لا يعرف بعد'}
+- الوقت المتاح يومياً: ${timeMap[answers.time] || answers.time}
+- الميزانية: ${budgetMap[answers.budget] || answers.budget}
+- الهدف: ${goalMap[answers.goal] || answers.goal}
+
+أعطني JSON فقط بهذا الشكل بالضبط (بدون أي نص خارج JSON):
+{
+  "title": "عنوان شخصي للخطة يتضمن الاسم",
+  "intro": "جملتان تشرحان لماذا هذه الخطة مناسبة لهذا الشخص تحديداً",
+  "income": "المبلغ المتوقع مثل $200-400",
+  "income_note": "جملة قصيرة عن كيفية الوصول لهذا الرقم",
+  "card1": {
+    "icon": "emoji",
+    "title": "المسار الموصى به",
+    "subtitle": "سبب اختياره",
+    "steps": ["خطوة 1", "خطوة 2", "خطوة 3", "خطوة 4"]
+  },
+  "card2": {
+    "icon": "emoji",
+    "title": "الأسبوع الأول — ابدأ هلق",
+    "subtitle": "مهام عملية فورية",
+    "steps": ["مهمة 1", "مهمة 2", "مهمة 3"]
+  },
+  "card3": {
+    "icon": "emoji",
+    "title": "أدواتك المجانية",
+    "subtitle": "كل ما تحتاجه بدون تكلفة",
+    "steps": ["أداة 1 — وصفها", "أداة 2 — وصفها", "أداة 3 — وصفها"]
+  }
+}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content.map(i => i.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const plan = JSON.parse(clean);
+    showResult(plan);
+  } catch (err) {
+    // Fallback plan if API fails
+    showResult(getFallbackPlan());
+  }
+}
+
+function getFallbackPlan() {
+  const skillsHasWriting = answers.skills.includes('writing') || answers.skills.includes('translate');
+  const skillsHasDesign = answers.skills.includes('design') || answers.skills.includes('social');
+  let path = skillsHasWriting ? 'كتابة المحتوى العربي' : skillsHasDesign ? 'إنشاء المحتوى البصري' : 'خدمات الذكاء الاصطناعي';
+  return {
+    title: `يا ${answers.name}، خطتك جاهزة!`,
+    intro: `بناءً على وضعك، ${path} هو أفضل مسار يناسبك. الطريق واضح والنتائج ممكنة خلال 30-60 يوم.`,
+    income: '$150 - $400',
+    income_note: 'مع 2-3 زبائن ثابتين شهرياً',
+    card1: {
+      icon: '🎯', title: `مسارك: ${path}`,
+      subtitle: 'الأنسب لمهاراتك ووقتك',
+      steps: ['حدد خدمة واحدة تقدمها', 'ابنِ ملفك الشخصي على Upwork', 'تقدم على 5 مشاريع يومياً', 'أول زبون خلال أسبوعين']
+    },
+    card2: {
+      icon: '⚡', title: 'الأسبوع الأول',
+      subtitle: 'ابدأ هلق بدون تفكير زيادة',
+      steps: ['سجّل على Upwork اليوم', 'اكتب أول proposal بمساعدة Claude', 'تقدم على 3 مشاريع غداً']
+    },
+    card3: {
+      icon: '🛠️', title: 'أدواتك المجانية',
+      subtitle: 'كل ما تحتاجه موجود',
+      steps: ['Claude — لكتابة المحتوى والمساعدة', 'Canva — للتصميم المجاني', 'Upwork — للعثور على زبائن']
+    }
+  };
+}
+
+function showResult(plan) {
+  document.getElementById('loading-screen').classList.remove('active');
+  const rs = document.getElementById('result-screen');
+  rs.classList.add('active');
+
+  document.getElementById('result-title').textContent = plan.title;
+  document.getElementById('result-intro').textContent = plan.intro;
+  document.getElementById('result-income').textContent = plan.income;
+  document.getElementById('result-income-note').textContent = plan.income_note;
+
+  [plan.card1, plan.card2, plan.card3].forEach((card, i) => {
+    document.getElementById('plan-card-' + (i+1)).innerHTML = `
+      <div class="plan-card-header">
+        <span class="plan-icon">${card.icon}</span>
+        <div><div class="plan-title">${card.title}</div><div class="plan-sub">${card.subtitle}</div></div>
+      </div>
+      <div class="plan-steps">
+        ${card.steps.map((s, idx) => `<div class="plan-step"><div class="plan-step-num">${idx+1}</div><div>${s}</div></div>`).join('')}
+      </div>`;
+  });
+}
+
+function shareResult() {
+  const text = `حصلت على خطتي الشخصية من منصة "ابدأ" 🚀\nجرب أنت: ibda-one.vercel.app`;
+  if (navigator.share) {
+    navigator.share({ title: 'خطتي على ابدأ', text, url: 'https://ibda-one.vercel.app' });
+  } else {
+    navigator.clipboard.writeText(text);
+    alert('تم نسخ الرسالة! شاركها مع أصحابك 📤');
+  }
+}
+
+updateProgress(1);
+</script>
+</body>
+</html>
