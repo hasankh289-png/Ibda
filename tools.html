@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ابدأ — مجموعة الأدوات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--black:#0F0F0F;--white:#FAFAF8;--green:#1A7A4A;--green-light:#E8F5EE;--gray:#6B6B6B;--gray-light:#F0EFEB;--border:#E2E0DA;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--white);color:var(--black);min-height:100vh;}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--white);z-index:100;}
+.nav-logo{font-size:18px;font-weight:600;}
+.nav-logo span{color:var(--green);}
+.nav-back{font-size:13px;color:var(--gray);text-decoration:none;}
+.nav-back:hover{color:var(--black);}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.lang-switcher{display:flex;gap:4px;background:var(--gray-light);border-radius:100px;padding:3px;}
+.lang-btn{padding:4px 12px;border-radius:100px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--gray);font-family:inherit;transition:all .15s;}
+.lang-btn.active{background:var(--white);color:var(--black);box-shadow:0 1px 3px rgba(0,0,0,.1);}
+
+/* TOOLS GRID */
+.tools-wrap{max-width:780px;margin:0 auto;padding:2.5rem 1.5rem;}
+.tools-header{text-align:center;margin-bottom:2.5rem;}
+.tools-header h1{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:600;letter-spacing:-0.5px;margin-bottom:.5rem;}
+.tools-header p{font-size:14px;color:var(--gray);font-weight:300;}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:2.5rem;}
+.tool-card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:1.25rem;cursor:pointer;transition:all .15s;text-align:right;}
+.tool-card:hover{border-color:var(--green);background:var(--green-light);}
+.tool-card.active{border-color:var(--green);background:var(--green-light);}
+.tool-icon{font-size:28px;margin-bottom:.75rem;display:block;}
+.tool-name{font-size:15px;font-weight:500;margin-bottom:.25rem;}
+.tool-desc{font-size:12px;color:var(--gray);font-weight:300;line-height:1.6;}
+
+/* TOOL PANEL */
+.tool-panel{display:none;background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:2rem;margin-top:1rem;}
+.tool-panel.active{display:block;animation:fadeUp .25s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.panel-header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);}
+.panel-icon{font-size:28px;}
+.panel-title{font-size:17px;font-weight:600;}
+.panel-sub{font-size:13px;color:var(--gray);margin-top:2px;font-weight:300;}
+
+/* FORM ELEMENTS */
+.form-group{margin-bottom:1.1rem;}
+.form-label{font-size:13px;font-weight:500;margin-bottom:6px;display:block;}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;background:var(--white);color:var(--black);outline:none;transition:border-color .2s;direction:rtl;}
+.form-textarea{resize:vertical;min-height:80px;line-height:1.6;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--green);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.generate-btn{width:100%;padding:13px;background:var(--black);color:var(--white);border:none;border-radius:100px;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;transition:opacity .2s;margin-top:.5rem;}
+.generate-btn:hover{opacity:.8;}
+.generate-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* RESULT */
+.result-box{display:none;margin-top:1.5rem;padding:1.25rem 1.5rem;background:var(--gray-light);border-radius:12px;font-size:13px;line-height:1.9;white-space:pre-wrap;direction:rtl;}
+.result-box.active{display:block;animation:fadeUp .25s ease;}
+.result-actions{display:flex;gap:8px;margin-top:1rem;}
+.action-btn{padding:8px 18px;border:1.5px solid var(--border);border-radius:100px;font-size:12px;font-family:inherit;cursor:pointer;background:transparent;color:var(--black);transition:all .15s;}
+.action-btn:hover{border-color:var(--black);}
+.action-btn.primary{background:var(--green);color:white;border-color:transparent;}
+
+/* LOADING */
+.loading{display:none;text-align:center;padding:2rem;color:var(--gray);font-size:13px;}
+.loading.active{display:block;}
+.dots span{display:inline-block;animation:blink 1.2s infinite;font-size:20px;}
+.dots span:nth-child(2){animation-delay:.2s;}
+.dots span:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,100%{opacity:.2;}50%{opacity:1;}}
+
+@media(max-width:600px){
+  .form-row{grid-template-columns:1fr;}
+  nav{padding:1rem 1.25rem;}
+  .tools-wrap{padding:1.5rem 1rem;}
+  .tool-panel{padding:1.25rem;}
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">ا<span>ب</span>دأ</div>
+  <div class="nav-right"><div class="lang-switcher"><button class="lang-btn active" onclick="setLang('ar',this)">ع</button><button class="lang-btn" onclick="setLang('en',this)">EN</button><button class="lang-btn" onclick="setLang('fr',this)">FR</button></div><a href="index.html" class="nav-back" id="nav-back-link">← الرئيسية</a></div>
+</nav>
+
+<div class="tools-wrap">
+  <div class="tools-header">
+    <h1>مجموعة الأدوات</h1>
+    <p>كل ما تحتاجه لتبدأ مسيرتك المهنية — في مكان واحد</p>
+  </div>
+
+  <div class="tools-grid">
+    <div class="tool-card" onclick="openTool('cv')">
+      <span class="tool-icon">📄</span>
+      <div class="tool-name">منشئ CV</div>
+      <div class="tool-desc">سيرة ذاتية احترافية بالعربي والإنجليزي خلال ثوانٍ</div>
+    </div>
+    <div class="tool-card" onclick="openTool('cover')">
+      <span class="tool-icon">✉️</span>
+      <div class="tool-name">Cover Letter</div>
+      <div class="tool-desc">رسالة تقديم مخصصة لكل وظيفة أو مشروع</div>
+    </div>
+    <div class="tool-card" onclick="openTool('proposal')">
+      <span class="tool-icon">💼</span>
+      <div class="tool-name">Proposal فري لانسر</div>
+      <div class="tool-desc">عرض عمل احترافي لـ Upwork وغيره يجذب الزبائن</div>
+    </div>
+    <div class="tool-card" onclick="openTool('social')">
+      <span class="tool-icon">📱</span>
+      <div class="tool-name">محتوى سوشيال</div>
+      <div class="tool-desc">منشورات جذابة لإنستغرام وتيك توك وLinkedIn</div>
+    </div>
+    <div class="tool-card" onclick="openTool('translate')">
+      <span class="tool-icon">🌐</span>
+      <div class="tool-name">مترجم احترافي</div>
+      <div class="tool-desc">ترجمة دقيقة تحافظ على الأسلوب والمعنى</div>
+    </div>
+  </div>
+
+  <!-- CV Tool -->
+  <div class="tool-panel" id="panel-cv">
+    <div class="panel-header">
+      <span class="panel-icon">📄</span>
+      <div><div class="panel-title">منشئ CV احترافي</div><div class="panel-sub">سيرة ذاتية جاهزة خلال ثوانٍ</div></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">الاسم الكامل</label><input class="form-input" id="cv-name" placeholder="مثال: أحمد محمد علي"/></div>
+      <div class="form-group"><label class="form-label">المسمى الوظيفي المستهدف</label><input class="form-input" id="cv-title" placeholder="مثال: مصمم جرافيك فري لانسر"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">البريد الإلكتروني</label><input class="form-input" id="cv-email" placeholder="email@example.com" dir="ltr"/></div>
+      <div class="form-group"><label class="form-label">رقم الهاتف</label><input class="form-input" id="cv-phone" placeholder="+961 xx xxx xxx" dir="ltr"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">المهارات الأساسية</label><input class="form-input" id="cv-skills" placeholder="مثال: Photoshop، Illustrator، Canva، إدارة السوشيال ميديا"/></div>
+    <div class="form-group"><label class="form-label">الخبرة أو المشاريع السابقة (اختياري)</label><textarea class="form-textarea" id="cv-exp" placeholder="مثال: صممت هوية بصرية لمطعم محلي، أدرت حسابات سوشيال لـ 3 متاجر..."></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">اللغة</label><select class="form-select" id="cv-lang"><option value="ar">عربي</option><option value="en">إنجليزي</option><option value="both">عربي + إنجليزي</option></select></div>
+      <div class="form-group"><label class="form-label">المستوى</label><select class="form-select" id="cv-level"><option value="junior">مبتدئ</option><option value="mid">متوسط</option><option value="senior">متقدم</option></select></div>
+    </div>
+    <button class="generate-btn" onclick="generate('cv')">✨ أنشئ CV الآن</button>
+    <div class="loading" id="loading-cv"><div class="dots"><span>●</span><span>●</span><span>●</span></div><p style="margin-top:.75rem">الذكاء الاصطناعي يكتب CV احترافياً...</p></div>
+    <div class="result-box" id="result-cv"></div>
+    <div class="result-actions" id="actions-cv" style="display:none">
+      <button class="action-btn primary" onclick="copyResult('cv')">📋 نسخ</button>
+      <button class="action-btn" onclick="generate('cv')">🔄 أعد التوليد</button>
+    </div>
+  </div>
+
+  <!-- Cover Letter Tool -->
+  <div class="tool-panel" id="panel-cover">
+    <div class="panel-header">
+      <span class="panel-icon">✉️</span>
+      <div><div class="panel-title">منشئ Cover Letter</div><div class="panel-sub">رسالة تقديم تفتح الأبواب</div></div>
+    </div>
+    <div class="form-group"><label class="form-label">اسمك</label><input class="form-input" id="cover-name" placeholder="مثال: سارة أحمد"/></div>
+    <div class="form-group"><label class="form-label">الوظيفة أو المشروع المتقدم له</label><input class="form-input" id="cover-job" placeholder="مثال: مصمم UI/UX لتطبيق موبايل"/></div>
+    <div class="form-group"><label class="form-label">اسم الشركة أو العميل (اختياري)</label><input class="form-input" id="cover-company" placeholder="مثال: شركة تك ستارت"/></div>
+    <div class="form-group"><label class="form-label">مهاراتك وخبراتك المختصرة</label><textarea class="form-textarea" id="cover-skills" placeholder="مثال: 2 سنة خبرة في تصميم واجهات، أعمل على Figma وAdobe XD، صممت 5 تطبيقات..."></textarea></div>
+    <div class="form-group"><label class="form-label">لماذا تريد هذا المشروع؟ (اختياري)</label><input class="form-input" id="cover-why" placeholder="مثال: بحب تحديات UX وبدي أبني portfolio قوي"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">اللغة</label><select class="form-select" id="cover-lang"><option value="ar">عربي</option><option value="en">إنجليزي</option></select></div>
+      <div class="form-group"><label class="form-label">الأسلوب</label><select class="form-select" id="cover-tone"><option value="professional">رسمي</option><option value="friendly">ودي ومهني</option><option value="creative">إبداعي</option></select></div>
+    </div>
+    <button class="generate-btn" onclick="generate('cover')">✨ أنشئ رسالة التقديم</button>
+    <div class="loading" id="loading-cover"><div class="dots"><span>●</span><span>●</span><span>●</span></div><p style="margin-top:.75rem">الذكاء الاصطناعي يكتب رسالتك...</p></div>
+    <div class="result-box" id="result-cover"></div>
+    <div class="result-actions" id="actions-cover" style="display:none">
+      <button class="action-btn primary" onclick="copyResult('cover')">📋 نسخ</button>
+      <button class="action-btn" onclick="generate('cover')">🔄 أعد التوليد</button>
+    </div>
+  </div>
+
+  <!-- Proposal Tool -->
+  <div class="tool-panel" id="panel-proposal">
+    <div class="panel-header">
+      <span class="panel-icon">💼</span>
+      <div><div class="panel-title">منشئ Proposal فري لانسر</div><div class="panel-sub">عرض عمل يكسب المشاريع</div></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">اسمك</label><input class="form-input" id="prop-name" placeholder="مثال: محمد علي"/></div>
+      <div class="form-group"><label class="form-label">تخصصك</label><input class="form-input" id="prop-specialty" placeholder="مثال: كاتب محتوى عربي"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">وصف المشروع المطلوب</label><textarea class="form-textarea" id="prop-project" placeholder="الصق وصف المشروع هنا أو اكتب ما يطلبه العميل..."></textarea></div>
+    <div class="form-group"><label class="form-label">مهاراتك المناسبة لهذا المشروع</label><textarea class="form-textarea" id="prop-skills" placeholder="مثال: كتبت أكثر من 200 مقال، خبرة في SEO العربي، متوفر فوراً..."></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">السعر المقترح</label><input class="form-input" id="prop-price" placeholder="مثال: $50" dir="ltr"/></div>
+      <div class="form-group"><label class="form-label">المنصة</label><select class="form-select" id="prop-platform"><option value="upwork">Upwork</option><option value="freelancer">Freelancer</option><option value="khamsat">خمسات</option><option value="direct">مباشر</option></select></div>
+    </div>
+    <button class="generate-btn" onclick="generate('proposal')">✨ أنشئ Proposal الآن</button>
+    <div class="loading" id="loading-proposal"><div class="dots"><span>●</span><span>●</span><span>●</span></div><p style="margin-top:.75rem">الذكاء الاصطناعي يكتب عرضك...</p></div>
+    <div class="result-box" id="result-proposal"></div>
+    <div class="result-actions" id="actions-proposal" style="display:none">
+      <button class="action-btn primary" onclick="copyResult('proposal')">📋 نسخ</button>
+      <button class="action-btn" onclick="generate('proposal')">🔄 أعد التوليد</button>
+    </div>
+  </div>
+
+  <!-- Social Media Tool -->
+  <div class="tool-panel" id="panel-social">
+    <div class="panel-header">
+      <span class="panel-icon">📱</span>
+      <div><div class="panel-title">منشئ محتوى سوشيال</div><div class="panel-sub">منشورات تجذب المتابعين والزبائن</div></div>
+    </div>
+    <div class="form-group"><label class="form-label">موضوع المنشور</label><input class="form-input" id="social-topic" placeholder="مثال: كيف بدأت كسب المال أونلاين بدون خبرة"/></div>
+    <div class="form-group"><label class="form-label">عن نفسك أو علامتك التجارية (اختياري)</label><input class="form-input" id="social-about" placeholder="مثال: فري لانسر كتابة محتوى، بساعد الشركات تنمو أونلاين"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">المنصة</label><select class="form-select" id="social-platform"><option value="instagram">إنستغرام</option><option value="tiktok">تيك توك</option><option value="linkedin">LinkedIn</option><option value="twitter">X (تويتر)</option><option value="facebook">فيسبوك</option></select></div>
+      <div class="form-group"><label class="form-label">الهدف</label><select class="form-select" id="social-goal"><option value="engage">تفاعل ومتابعين</option><option value="sell">بيع خدمة أو منتج</option><option value="educate">تعليم وقيمة</option><option value="inspire">إلهام وتحفيز</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">اللغة</label><select class="form-select" id="social-lang"><option value="ar">عربي</option><option value="en">إنجليزي</option></select></div>
+      <div class="form-group"><label class="form-label">عدد المنشورات</label><select class="form-select" id="social-count"><option value="1">منشور واحد</option><option value="3">3 منشورات</option><option value="5">5 منشورات</option></select></div>
+    </div>
+    <button class="generate-btn" onclick="generate('social')">✨ أنشئ المحتوى الآن</button>
+    <div class="loading" id="loading-social"><div class="dots"><span>●</span><span>●</span><span>●</span></div><p style="margin-top:.75rem">الذكاء الاصطناعي يكتب محتواك...</p></div>
+    <div class="result-box" id="result-social"></div>
+    <div class="result-actions" id="actions-social" style="display:none">
+      <button class="action-btn primary" onclick="copyResult('social')">📋 نسخ</button>
+      <button class="action-btn" onclick="generate('social')">🔄 أعد التوليد</button>
+    </div>
+  </div>
+
+  <!-- Translate Tool -->
+  <div class="tool-panel" id="panel-translate">
+    <div class="panel-header">
+      <span class="panel-icon">🌐</span>
+      <div><div class="panel-title">مترجم احترافي</div><div class="panel-sub">ترجمة تحافظ على الأسلوب والمعنى</div></div>
+    </div>
+    <div class="form-group"><label class="form-label">النص المراد ترجمته</label><textarea class="form-textarea" id="trans-text" style="min-height:120px" placeholder="الصق النص هنا..."></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">من</label><select class="form-select" id="trans-from"><option value="ar">عربي</option><option value="en">إنجليزي</option><option value="fr">فرنساوي</option><option value="auto">تلقائي</option></select></div>
+      <div class="form-group"><label class="form-label">إلى</label><select class="form-select" id="trans-to"><option value="en">إنجليزي</option><option value="ar">عربي</option><option value="fr">فرنساوي</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">نوع النص</label><select class="form-select" id="trans-type"><option value="general">عام</option><option value="business">أعمال ومهني</option><option value="marketing">تسويق وإعلانات</option><option value="cv">سيرة ذاتية</option><option value="social">سوشيال ميديا</option></select></div>
+      <div class="form-group"><label class="form-label">الأسلوب</label><select class="form-select" id="trans-tone"><option value="formal">رسمي</option><option value="friendly">ودي</option><option value="simple">بسيط ومباشر</option></select></div>
+    </div>
+    <button class="generate-btn" onclick="generate('translate')">🌐 ترجم الآن</button>
+    <div class="loading" id="loading-translate"><div class="dots"><span>●</span><span>●</span><span>●</span></div><p style="margin-top:.75rem">الذكاء الاصطناعي يترجم...</p></div>
+    <div class="result-box" id="result-translate"></div>
+    <div class="result-actions" id="actions-translate" style="display:none">
+      <button class="action-btn primary" onclick="copyResult('translate')">📋 نسخ</button>
+      <button class="action-btn" onclick="generate('translate')">🔄 أعد الترجمة</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openTool(id) {
+  document.querySelectorAll('.tool-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tool-panel').forEach(p => { p.classList.remove('active'); });
+  event.currentTarget.classList.add('active');
+  const panel = document.getElementById('panel-' + id);
+  panel.classList.add('active');
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+}
+
+function getPrompt(tool) {
+  const v = id => document.getElementById(id)?.value?.trim() || '';
+  const langLabel = { ar: 'العربية', en: 'الإنجليزية', fr: 'الفرنسية', both: 'العربية والإنجليزية', auto: 'تلقائي' };
+  const levelLabel = { junior: 'مبتدئ', mid: 'متوسط', senior: 'متقدم' };
+  const toneLabel = { professional: 'رسمي ومهني', friendly: 'ودي ومهني', creative: 'إبداعي', formal: 'رسمي', simple: 'بسيط ومباشر' };
+  const platformLabel = { upwork: 'Upwork', freelancer: 'Freelancer', khamsat: 'خمسات', direct: 'مباشر', instagram: 'إنستغرام', tiktok: 'تيك توك', linkedin: 'LinkedIn', twitter: 'X', facebook: 'فيسبوك' };
+  const goalLabel = { engage: 'زيادة التفاعل والمتابعين', sell: 'بيع خدمة أو منتج', educate: 'تقديم قيمة وتعليم', inspire: 'إلهام وتحفيز' };
+  const typeLabel = { general: 'عام', business: 'أعمال ومهني', marketing: 'تسويق وإعلانات', cv: 'سيرة ذاتية', social: 'سوشيال ميديا' };
+
+  if (tool === 'cv') {
+    const lang = v('cv-lang');
+    const isEn = lang === 'en';
+    const isBoth = lang === 'both';
+    return `أنت خبير في كتابة السير الذاتية الاحترافية. اكتب سيرة ذاتية ${isBoth ? 'باللغتين العربية والإنجليزية' : 'باللغة ' + (langLabel[lang] || 'العربية')} لشخص ${levelLabel[v('cv-level')] || 'مبتدئ'}.
+
+المعلومات:
+- الاسم: ${v('cv-name') || 'غير محدد'}
+- المسمى المستهدف: ${v('cv-title') || 'غير محدد'}
+- البريد: ${v('cv-email') || 'غير محدد'}
+- الهاتف: ${v('cv-phone') || 'غير محدد'}
+- المهارات: ${v('cv-skills') || 'غير محدد'}
+- الخبرات: ${v('cv-exp') || 'لا يوجد خبرة سابقة — اكتب ملخصاً مهنياً مناسباً للمبتدئين'}
+
+اكتب السيرة الذاتية بشكل احترافي وجاهز للاستخدام. استخدم أقسام واضحة: الملخص المهني، المهارات، الخبرات (أو المشاريع إن لم توجد خبرة)، التعليم. لا تضف أي شرح خارج السيرة الذاتية.`;
+  }
+
+  if (tool === 'cover') {
+    return `أنت خبير في كتابة رسائل التقديم الاحترافية. اكتب Cover Letter ${v('cover-lang') === 'en' ? 'باللغة الإنجليزية' : 'باللغة العربية'} بأسلوب ${toneLabel[v('cover-tone')] || 'رسمي ومهني'}.
+
+المعلومات:
+- الاسم: ${v('cover-name') || 'المتقدم'}
+- الوظيفة/المشروع: ${v('cover-job') || 'غير محدد'}
+- الشركة/العميل: ${v('cover-company') || 'غير محدد'}
+- المهارات والخبرة: ${v('cover-skills') || 'غير محدد'}
+- سبب الاهتمام: ${v('cover-why') || 'الرغبة في التطور المهني'}
+
+اكتب رسالة تقديم مقنعة ومخصصة، فقرة افتتاحية قوية، فقرة وسطى تبرز القيمة المضافة، وفقرة ختامية مع دعوة للعمل. لا تضف أي شرح خارج الرسالة.`;
+  }
+
+  if (tool === 'proposal') {
+    return `أنت خبير في كتابة عروض العمل الفري لانسر. اكتب Proposal احترافياً لمنصة ${platformLabel[v('prop-platform')] || 'Upwork'}.
+
+المعلومات:
+- الاسم: ${v('prop-name') || 'الفري لانسر'}
+- التخصص: ${v('prop-specialty') || 'غير محدد'}
+- وصف المشروع: ${v('prop-project') || 'غير محدد'}
+- المهارات المناسبة: ${v('prop-skills') || 'غير محدد'}
+- السعر: ${v('prop-price') || 'سيُحدد لاحقاً'}
+
+اكتب Proposal قصيراً ومؤثراً (150-250 كلمة): ابدأ بفهم المشكلة، اعرض الحل، أبرز مهاراتك المناسبة، واختم بدعوة للتواصل. باللغة الإنجليزية لأنها أنجح على المنصات العالمية. لا تضف أي شرح خارج الـ Proposal.`;
+  }
+
+  if (tool === 'social') {
+    const count = parseInt(v('social-count')) || 1;
+    return `أنت خبير في تسويق السوشيال ميديا. اكتب ${count} منشور${count > 1 ? 'ات' : ''} احترافي${count > 1 ? 'ة' : ''} لمنصة ${platformLabel[v('social-platform')] || 'إنستغرام'} باللغة ${v('social-lang') === 'en' ? 'الإنجليزية' : 'العربية'}.
+
+المعلومات:
+- الموضوع: ${v('social-topic') || 'غير محدد'}
+- عن الشخص/العلامة: ${v('social-about') || 'غير محدد'}
+- الهدف: ${goalLabel[v('social-goal')] || 'التفاعل'}
+
+لكل منشور: اكتب نصاً جذاباً مع هوك قوي في السطر الأول، محتوى قيّم، ودعوة للتفاعل، وهاشتاقات مناسبة. فصّل بين المنشورات بسطر فارغ. لا تضف أي شرح خارج المنشورات.`;
+  }
+
+  if (tool === 'translate') {
+    const fromLang = { ar: 'العربية', en: 'الإنجليزية', fr: 'الفرنسية', auto: 'تلقائي' };
+    const toLang = { ar: 'العربية', en: 'الإنجليزية', fr: 'الفرنسية' };
+    return `أنت مترجم احترافي. ترجم النص التالي من اللغة ${fromLang[v('trans-from')] || 'تلقائي'} إلى اللغة ${toLang[v('trans-to')] || 'الإنجليزية'}.
+
+نوع النص: ${typeLabel[v('trans-type')] || 'عام'}
+الأسلوب المطلوب: ${toneLabel[v('trans-tone')] || 'رسمي'}
+
+النص:
+${v('trans-text') || ''}
+
+قدّم الترجمة فقط بدون أي شرح أو ملاحظات. حافظ على الأسلوب والمعنى الأصلي.`;
+  }
+  return '';
+}
+
+async function generate(tool) {
+  const prompt = getPrompt(tool);
+  if (!prompt || prompt.includes('غير محدد\nغير محدد\nغير محدد') || (tool === 'translate' && !document.getElementById('trans-text')?.value?.trim())) {
+    alert('يرجى تعبئة الحقول المطلوبة أولاً');
+    return;
+  }
+
+  const btn = document.querySelector(`#panel-${tool === 'translate' ? 'translate' : tool} .generate-btn`);
+  const loading = document.getElementById(`loading-${tool === 'translate' ? 'translate' : tool}`);
+  const result = document.getElementById(`result-${tool === 'translate' ? 'translate' : tool}`);
+  const actions = document.getElementById(`actions-${tool === 'translate' ? 'translate' : tool}`);
+
+  btn.disabled = true;
+  loading.classList.add('active');
+  result.classList.remove('active');
+  actions.style.display = 'none';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(i => i.text || '').join('') || 'حدث خطأ، حاول مرة أخرى.';
+    result.textContent = text;
+    result.classList.add('active');
+    actions.style.display = 'flex';
+  } catch (e) {
+    result.textContent = 'حدث خطأ في الاتصال. تأكد من اتصالك بالإنترنت وحاول مجدداً.';
+    result.classList.add('active');
+  }
+
+  btn.disabled = false;
+  loading.classList.remove('active');
+  result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyResult(tool) {
+  const id = tool === 'translate' ? 'translate' : tool;
+  const text = document.getElementById('result-' + id)?.textContent;
+  if (text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = event.currentTarget;
+      btn.textContent = '✓ تم النسخ!';
+      setTimeout(() => btn.textContent = '📋 نسخ', 2000);
+    });
+  }
+}
+</script>
+</body>
+</html>
+<script>
+const i18n = {
+  ar: {
+    dir: 'rtl', lang: 'ar',
+    title: 'ابدأ — مجموعة الأدوات',
+    pageTitle: 'مجموعة الأدوات',
+    pageSub: 'كل ما تحتاجه لتبدأ مسيرتك المهنية — في مكان واحد',
+    backLink: '← الرئيسية',
+    tools: [
+      { name: 'منشئ CV', desc: 'سيرة ذاتية احترافية بالعربي والإنجليزي خلال ثوانٍ' },
+      { name: 'Cover Letter', desc: 'رسالة تقديم مخصصة لكل وظيفة أو مشروع' },
+      { name: 'Proposal فري لانسر', desc: 'عرض عمل احترافي لـ Upwork وغيره يجذب الزبائن' },
+      { name: 'محتوى سوشيال', desc: 'منشورات جذابة لإنستغرام وتيك توك وLinkedIn' },
+      { name: 'مترجم احترافي', desc: 'ترجمة دقيقة تحافظ على الأسلوب والمعنى' }
+    ],
+    panelTitles: { cv: 'منشئ CV احترافي', cover: 'منشئ Cover Letter', proposal: 'منشئ Proposal فري لانسر', social: 'منشئ محتوى سوشيال', translate: 'مترجم احترافي' },
+    panelSubs: { cv: 'سيرة ذاتية جاهزة خلال ثوانٍ', cover: 'رسالة تقديم تفتح الأبواب', proposal: 'عرض عمل يكسب المشاريع', social: 'منشورات تجذب المتابعين والزبائن', translate: 'ترجمة تحافظ على الأسلوب والمعنى' },
+    generateBtn: '✨ أنشئ الآن',
+    copyBtn: '📋 نسخ', copiedBtn: '✓ تم النسخ!', regenBtn: '🔄 أعد التوليد', transBtn: '🌐 ترجم الآن', reTransBtn: '🔄 أعد الترجمة',
+    loadingTexts: { cv: 'الذكاء الاصطناعي يكتب CV احترافياً...', cover: 'الذكاء الاصطناعي يكتب رسالتك...', proposal: 'الذكاء الاصطناعي يكتب عرضك...', social: 'الذكاء الاصطناعي يكتب محتواك...', translate: 'الذكاء الاصطناعي يترجم...' },
+    labels: {
+      fullName:'الاسم الكامل', targetTitle:'المسمى الوظيفي المستهدف', email:'البريد الإلكتروني', phone:'رقم الهاتف',
+      mainSkills:'المهارات الأساسية', prevExp:'الخبرة أو المشاريع السابقة (اختياري)', lang:'اللغة', level:'المستوى',
+      yourName:'اسمك', jobApplied:'الوظيفة أو المشروع المتقدم له', companyName:'اسم الشركة أو العميل (اختياري)',
+      skillsExp:'مهاراتك وخبراتك المختصرة', whyJob:'لماذا تريد هذا المشروع؟ (اختياري)', style:'الأسلوب',
+      specialty:'تخصصك', projectDesc:'وصف المشروع المطلوب', suitableSkills:'مهاراتك المناسبة', suggestedPrice:'السعر المقترح', platform:'المنصة',
+      postTopic:'موضوع المنشور', aboutYou:'عن نفسك أو علامتك التجارية (اختياري)', goal:'الهدف', postCount:'عدد المنشورات',
+      textToTranslate:'النص المراد ترجمته', from:'من', to:'إلى', textType:'نوع النص',
+      ar:'عربي', en:'إنجليزي', fr:'فرنساوي', both:'عربي + إنجليزي', auto:'تلقائي',
+      junior:'مبتدئ', mid:'متوسط', senior:'متقدم',
+      professional:'رسمي', friendly:'ودي ومهني', creative:'إبداعي', formal:'رسمي', simple:'بسيط ومباشر',
+      engage:'تفاعل ومتابعين', sell:'بيع خدمة أو منتج', educate:'تعليم وقيمة', inspire:'إلهام وتحفيز',
+      one:'منشور واحد', three:'3 منشورات', five:'5 منشورات',
+      general:'عام', business:'أعمال ومهني', marketing:'تسويق وإعلانات', social_type:'سوشيال ميديا', cv_type:'سيرة ذاتية',
+      upwork:'Upwork', freelancer:'Freelancer', khamsat:'خمسات', direct:'مباشر',
+      instagram:'إنستغرام', tiktok:'تيك توك', linkedin:'LinkedIn', twitter:'X (تويتر)', facebook:'فيسبوك'
+    },
+    placeholders: {
+      name:'مثال: أحمد محمد علي', title:'مثال: مصمم جرافيك فري لانسر', email:'email@example.com', phone:'+961 xx xxx xxx',
+      skills:'مثال: Photoshop، Illustrator، Canva', exp:'مثال: صممت هوية بصرية لمطعم محلي...',
+      coverName:'مثال: سارة أحمد', coverJob:'مثال: مصمم UI/UX لتطبيق موبايل', coverCompany:'مثال: شركة تك ستارت',
+      coverSkills:'مثال: 2 سنة خبرة في تصميم واجهات...', coverWhy:'مثال: بحب تحديات UX وبدي أبني portfolio',
+      propName:'مثال: محمد علي', propSpec:'مثال: كاتب محتوى عربي', propProject:'الصق وصف المشروع هنا...',
+      propSkills:'مثال: كتبت أكثر من 200 مقال...', propPrice:'مثال: $50',
+      socialTopic:'مثال: كيف بدأت كسب المال أونلاين بدون خبرة', socialAbout:'مثال: فري لانسر كتابة محتوى...',
+      transText:'الصق النص هنا...'
+    },
+    emptyFields:'يرجى تعبئة الحقول المطلوبة أولاً', connError:'حدث خطأ في الاتصال. تأكد من اتصالك بالإنترنت وحاول مجدداً.'
+  },
+  en: {
+    dir: 'ltr', lang: 'en',
+    title: 'Ibda — Toolkit',
+    pageTitle: 'Toolkit',
+    pageSub: 'Everything you need to start your online career — in one place',
+    backLink: 'Home →',
+    tools: [
+      { name: 'CV Builder', desc: 'Professional resume in Arabic or English within seconds' },
+      { name: 'Cover Letter', desc: 'Tailored cover letter for every job or project' },
+      { name: 'Freelance Proposal', desc: 'Winning proposal for Upwork and other platforms' },
+      { name: 'Social Content', desc: 'Engaging posts for Instagram, TikTok and LinkedIn' },
+      { name: 'Translator', desc: 'Accurate translation that preserves tone and meaning' }
+    ],
+    panelTitles: { cv: 'Professional CV Builder', cover: 'Cover Letter Generator', proposal: 'Freelance Proposal Builder', social: 'Social Media Content', translate: 'Professional Translator' },
+    panelSubs: { cv: 'Ready-to-use resume in seconds', cover: 'A letter that opens doors', proposal: 'A proposal that wins projects', social: 'Posts that attract followers and clients', translate: 'Translation that preserves style and meaning' },
+    generateBtn: '✨ Generate Now',
+    copyBtn: '📋 Copy', copiedBtn: '✓ Copied!', regenBtn: '🔄 Regenerate', transBtn: '🌐 Translate Now', reTransBtn: '🔄 Re-translate',
+    loadingTexts: { cv: 'AI is writing your professional CV...', cover: 'AI is writing your cover letter...', proposal: 'AI is writing your proposal...', social: 'AI is writing your content...', translate: 'AI is translating...' },
+    labels: {
+      fullName:'Full Name', targetTitle:'Target Job Title', email:'Email Address', phone:'Phone Number',
+      mainSkills:'Main Skills', prevExp:'Previous Experience or Projects (optional)', lang:'Language', level:'Level',
+      yourName:'Your Name', jobApplied:'Job or Project Applied For', companyName:'Company or Client Name (optional)',
+      skillsExp:'Your Relevant Skills & Experience', whyJob:'Why do you want this job? (optional)', style:'Style',
+      specialty:'Your Specialty', projectDesc:'Project Description', suitableSkills:'Your Relevant Skills', suggestedPrice:'Suggested Price', platform:'Platform',
+      postTopic:'Post Topic', aboutYou:'About You or Your Brand (optional)', goal:'Goal', postCount:'Number of Posts',
+      textToTranslate:'Text to Translate', from:'From', to:'To', textType:'Text Type',
+      ar:'Arabic', en:'English', fr:'French', both:'Arabic + English', auto:'Auto-detect',
+      junior:'Beginner', mid:'Intermediate', senior:'Advanced',
+      professional:'Professional', friendly:'Friendly & Professional', creative:'Creative', formal:'Formal', simple:'Simple & Direct',
+      engage:'Engagement & Followers', sell:'Sell a Service or Product', educate:'Education & Value', inspire:'Inspiration & Motivation',
+      one:'1 Post', three:'3 Posts', five:'5 Posts',
+      general:'General', business:'Business & Professional', marketing:'Marketing & Ads', social_type:'Social Media', cv_type:'Resume/CV',
+      upwork:'Upwork', freelancer:'Freelancer', khamsat:'Khamsat', direct:'Direct',
+      instagram:'Instagram', tiktok:'TikTok', linkedin:'LinkedIn', twitter:'X (Twitter)', facebook:'Facebook'
+    },
+    placeholders: {
+      name:'e.g. John Smith', title:'e.g. Freelance Graphic Designer', email:'email@example.com', phone:'+1 xxx xxx xxxx',
+      skills:'e.g. Photoshop, Illustrator, Canva', exp:'e.g. Designed a brand identity for a local restaurant...',
+      coverName:'e.g. Sara Ahmed', coverJob:'e.g. UI/UX Designer for mobile app', coverCompany:'e.g. Tech Start Co.',
+      coverSkills:'e.g. 2 years in UI design, Figma expert...', coverWhy:'e.g. I love UX challenges and want to build my portfolio',
+      propName:'e.g. Mohammed Ali', propSpec:'e.g. Arabic Content Writer', propProject:'Paste the project description here...',
+      propSkills:'e.g. Written 200+ articles, SEO expert...', propPrice:'e.g. $50',
+      socialTopic:'e.g. How I started earning online with no experience', socialAbout:'e.g. Freelance content writer helping businesses grow online...',
+      transText:'Paste your text here...'
+    },
+    emptyFields:'Please fill in the required fields first.', connError:'Connection error. Check your internet and try again.'
+  },
+  fr: {
+    dir: 'ltr', lang: 'fr',
+    title: 'Ibda — Boîte à outils',
+    pageTitle: 'Boîte à outils',
+    pageSub: 'Tout ce dont vous avez besoin pour démarrer — en un seul endroit',
+    backLink: 'Accueil →',
+    tools: [
+      { name: 'Créateur de CV', desc: 'CV professionnel en arabe ou anglais en quelques secondes' },
+      { name: 'Lettre de motivation', desc: 'Lettre personnalisée pour chaque poste ou projet' },
+      { name: 'Proposition Freelance', desc: 'Offre professionnelle pour Upwork et autres plateformes' },
+      { name: 'Contenu Social', desc: 'Publications engageantes pour Instagram, TikTok et LinkedIn' },
+      { name: 'Traducteur Pro', desc: 'Traduction précise qui préserve le style et le sens' }
+    ],
+    panelTitles: { cv: 'Créateur de CV Professionnel', cover: 'Générateur de Lettre de Motivation', proposal: 'Créateur de Proposition Freelance', social: 'Contenu Réseaux Sociaux', translate: 'Traducteur Professionnel' },
+    panelSubs: { cv: 'CV prêt à l\'emploi en quelques secondes', cover: 'Une lettre qui ouvre des portes', proposal: 'Une proposition qui gagne des projets', social: 'Des publications qui attirent les abonnés', translate: 'Traduction qui préserve le style et le sens' },
+    generateBtn: '✨ Générer maintenant',
+    copyBtn: '📋 Copier', copiedBtn: '✓ Copié !', regenBtn: '🔄 Régénérer', transBtn: '🌐 Traduire maintenant', reTransBtn: '🔄 Retraduire',
+    loadingTexts: { cv: "L'IA rédige votre CV professionnel...", cover: "L'IA rédige votre lettre...", proposal: "L'IA rédige votre proposition...", social: "L'IA rédige votre contenu...", translate: "L'IA traduit..." },
+    labels: {
+      fullName:'Nom complet', targetTitle:'Titre du poste visé', email:'Adresse e-mail', phone:'Numéro de téléphone',
+      mainSkills:'Compétences principales', prevExp:'Expérience ou projets précédents (optionnel)', lang:'Langue', level:'Niveau',
+      yourName:'Votre nom', jobApplied:'Poste ou projet visé', companyName:'Nom de l\'entreprise (optionnel)',
+      skillsExp:'Vos compétences et expériences', whyJob:'Pourquoi voulez-vous ce poste ? (optionnel)', style:'Style',
+      specialty:'Votre spécialité', projectDesc:'Description du projet', suitableSkills:'Vos compétences adaptées', suggestedPrice:'Prix suggéré', platform:'Plateforme',
+      postTopic:'Sujet de la publication', aboutYou:'À propos de vous ou votre marque (optionnel)', goal:'Objectif', postCount:'Nombre de publications',
+      textToTranslate:'Texte à traduire', from:'De', to:'Vers', textType:'Type de texte',
+      ar:'Arabe', en:'Anglais', fr:'Français', both:'Arabe + Anglais', auto:'Automatique',
+      junior:'Débutant', mid:'Intermédiaire', senior:'Avancé',
+      professional:'Professionnel', friendly:'Amical & Professionnel', creative:'Créatif', formal:'Formel', simple:'Simple & Direct',
+      engage:'Engagement & Abonnés', sell:'Vendre un service', educate:'Éducation & Valeur', inspire:'Inspiration',
+      one:'1 publication', three:'3 publications', five:'5 publications',
+      general:'Général', business:'Affaires & Professionnel', marketing:'Marketing & Pub', social_type:'Réseaux sociaux', cv_type:'CV',
+      upwork:'Upwork', freelancer:'Freelancer', khamsat:'Khamsat', direct:'Direct',
+      instagram:'Instagram', tiktok:'TikTok', linkedin:'LinkedIn', twitter:'X (Twitter)', facebook:'Facebook'
+    },
+    placeholders: {
+      name:'ex. Jean Dupont', title:'ex. Designer Graphique Freelance', email:'email@example.com', phone:'+33 x xx xx xx xx',
+      skills:'ex. Photoshop, Illustrator, Canva', exp:'ex. Créé une identité visuelle pour un restaurant local...',
+      coverName:'ex. Sara Ahmed', coverJob:'ex. Designer UI/UX pour application mobile', coverCompany:'ex. Tech Start SARL',
+      coverSkills:'ex. 2 ans en design d\'interfaces, expert Figma...', coverWhy:'ex. J\'adore les défis UX',
+      propName:'ex. Mohammed Ali', propSpec:'ex. Rédacteur de contenu arabe', propProject:'Collez la description du projet ici...',
+      propSkills:'ex. Plus de 200 articles rédigés...', propPrice:'ex. 50€',
+      socialTopic:'ex. Comment j\'ai commencé à gagner de l\'argent en ligne', socialAbout:'ex. Rédacteur freelance aidant les entreprises...',
+      transText:'Collez votre texte ici...'
+    },
+    emptyFields:'Veuillez remplir les champs requis d\'abord.', connError:'Erreur de connexion. Vérifiez votre connexion Internet et réessayez.'
+  }
+};
+
+let currentLang = 'ar';
+
+function setLang(lang, btn) {
+  currentLang = lang;
+  const t = i18n[lang];
+  const html = document.documentElement;
+  html.lang = t.lang;
+  html.dir = t.dir;
+  document.title = t.title;
+
+  // Update nav
+  document.querySelector('.nav-back').textContent = t.backLink;
+
+  // Update page header
+  document.querySelector('.tools-header h1').textContent = t.pageTitle;
+  document.querySelector('.tools-header p').textContent = t.pageSub;
+
+  // Update tool cards
+  const cards = document.querySelectorAll('.tool-card');
+  cards.forEach((card, i) => {
+    if (t.tools[i]) {
+      card.querySelector('.tool-name').textContent = t.tools[i].name;
+      card.querySelector('.tool-desc').textContent = t.tools[i].desc;
+    }
+  });
+
+  // Update panel titles and subtitles
+  ['cv','cover','proposal','social','translate'].forEach(tool => {
+    const panel = document.getElementById('panel-' + tool);
+    if (!panel) return;
+    const titleEl = panel.querySelector('.panel-title');
+    const subEl = panel.querySelector('.panel-sub');
+    if (titleEl) titleEl.textContent = t.panelTitles[tool];
+    if (subEl) subEl.textContent = t.panelSubs[tool];
+
+    // Update generate button
+    const genBtn = panel.querySelector('.generate-btn');
+    if (genBtn) {
+      if (tool === 'translate') genBtn.textContent = t.transBtn;
+      else genBtn.textContent = t.generateBtn;
+    }
+
+    // Update loading text
+    const loadingP = document.getElementById('loading-' + tool)?.querySelector('p');
+    if (loadingP) loadingP.textContent = t.loadingTexts[tool];
+
+    // Update action buttons
+    const actions = document.getElementById('actions-' + tool);
+    if (actions) {
+      const btns = actions.querySelectorAll('.action-btn');
+      if (btns[0]) btns[0].textContent = t.copyBtn;
+      if (btns[1]) btns[1].textContent = tool === 'translate' ? t.reTransBtn : t.regenBtn;
+    }
+  });
+
+  // Update form labels
+  updateFormLabels(lang);
+
+  // Update lang switcher buttons
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function updateFormLabels(lang) {
+  const t = i18n[lang];
+  const L = t.labels;
+  const P = t.placeholders;
+
+  // CV
+  const cvLabels = ['fullName','targetTitle','email','phone','mainSkills','prevExp','lang','level'];
+  const cvIds = ['cv-name','cv-title','cv-email','cv-phone','cv-skills','cv-exp','cv-lang','cv-level'];
+  const cvPlaceholders = [P.name, P.title, P.email, P.phone, P.skills, P.exp, '', ''];
+  const cvLabelKeys = ['fullName','targetTitle','email','phone','mainSkills','prevExp','lang','level'];
+
+  // Update CV labels
+  const cvPanel = document.getElementById('panel-cv');
+  if (cvPanel) {
+    const labels = cvPanel.querySelectorAll('.form-label');
+    const labelTexts = [L.fullName, L.targetTitle, L.email, L.phone, L.mainSkills, L.prevExp, L.lang, L.level];
+    labels.forEach((lbl, i) => { if (labelTexts[i]) lbl.textContent = labelTexts[i]; });
+
+    const inputs = [document.getElementById('cv-name'), document.getElementById('cv-title'), document.getElementById('cv-email'), document.getElementById('cv-phone'), document.getElementById('cv-skills'), document.getElementById('cv-exp')];
+    const phs = [P.name, P.title, P.email, P.phone, P.skills, P.exp];
+    inputs.forEach((inp, i) => { if (inp && phs[i]) inp.placeholder = phs[i]; });
+
+    // CV select options
+    const cvLangSel = document.getElementById('cv-lang');
+    if (cvLangSel) cvLangSel.innerHTML = `<option value="ar">${L.ar}</option><option value="en">${L.en}</option><option value="both">${L.both}</option>`;
+    const cvLevelSel = document.getElementById('cv-level');
+    if (cvLevelSel) cvLevelSel.innerHTML = `<option value="junior">${L.junior}</option><option value="mid">${L.mid}</option><option value="senior">${L.senior}</option>`;
+  }
+
+  // Cover Letter
+  const coverPanel = document.getElementById('panel-cover');
+  if (coverPanel) {
+    const labels = coverPanel.querySelectorAll('.form-label');
+    const labelTexts = [L.yourName, L.jobApplied, L.companyName, L.skillsExp, L.whyJob, L.lang, L.style];
+    labels.forEach((lbl, i) => { if (labelTexts[i]) lbl.textContent = labelTexts[i]; });
+
+    ['cover-name','cover-job','cover-company','cover-skills','cover-why'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      const phs = [P.coverName, P.coverJob, P.coverCompany, P.coverSkills, P.coverWhy];
+      if (el && phs[i]) el.placeholder = phs[i];
+    });
+
+    const coverLangSel = document.getElementById('cover-lang');
+    if (coverLangSel) coverLangSel.innerHTML = `<option value="ar">${L.ar}</option><option value="en">${L.en}</option>`;
+    const coverToneSel = document.getElementById('cover-tone');
+    if (coverToneSel) coverToneSel.innerHTML = `<option value="professional">${L.professional}</option><option value="friendly">${L.friendly}</option><option value="creative">${L.creative}</option>`;
+  }
+
+  // Proposal
+  const propPanel = document.getElementById('panel-proposal');
+  if (propPanel) {
+    const labels = propPanel.querySelectorAll('.form-label');
+    const labelTexts = [L.yourName, L.specialty, L.projectDesc, L.suitableSkills, L.suggestedPrice, L.platform];
+    labels.forEach((lbl, i) => { if (labelTexts[i]) lbl.textContent = labelTexts[i]; });
+
+    ['prop-name','prop-specialty','prop-project','prop-skills','prop-price'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      const phs = [P.propName, P.propSpec, P.propProject, P.propSkills, P.propPrice];
+      if (el && phs[i]) el.placeholder = phs[i];
+    });
+
+    const propPlatSel = document.getElementById('prop-platform');
+    if (propPlatSel) propPlatSel.innerHTML = `<option value="upwork">${L.upwork}</option><option value="freelancer">${L.freelancer}</option><option value="khamsat">${L.khamsat}</option><option value="direct">${L.direct}</option>`;
+  }
+
+  // Social
+  const socialPanel = document.getElementById('panel-social');
+  if (socialPanel) {
+    const labels = socialPanel.querySelectorAll('.form-label');
+    const labelTexts = [L.postTopic, L.aboutYou, L.platform, L.goal, L.lang, L.postCount];
+    labels.forEach((lbl, i) => { if (labelTexts[i]) lbl.textContent = labelTexts[i]; });
+
+    const st = document.getElementById('social-topic');
+    if (st) st.placeholder = P.socialTopic;
+    const sa = document.getElementById('social-about');
+    if (sa) sa.placeholder = P.socialAbout;
+
+    const socialPlatSel = document.getElementById('social-platform');
+    if (socialPlatSel) socialPlatSel.innerHTML = `<option value="instagram">${L.instagram}</option><option value="tiktok">${L.tiktok}</option><option value="linkedin">${L.linkedin}</option><option value="twitter">${L.twitter}</option><option value="facebook">${L.facebook}</option>`;
+    const socialGoalSel = document.getElementById('social-goal');
+    if (socialGoalSel) socialGoalSel.innerHTML = `<option value="engage">${L.engage}</option><option value="sell">${L.sell}</option><option value="educate">${L.educate}</option><option value="inspire">${L.inspire}</option>`;
+    const socialLangSel = document.getElementById('social-lang');
+    if (socialLangSel) socialLangSel.innerHTML = `<option value="ar">${L.ar}</option><option value="en">${L.en}</option>`;
+    const socialCountSel = document.getElementById('social-count');
+    if (socialCountSel) socialCountSel.innerHTML = `<option value="1">${L.one}</option><option value="3">${L.three}</option><option value="5">${L.five}</option>`;
+  }
+
+  // Translate
+  const transPanel = document.getElementById('panel-translate');
+  if (transPanel) {
+    const labels = transPanel.querySelectorAll('.form-label');
+    const labelTexts = [L.textToTranslate, L.from, L.to, L.textType, L.style];
+    labels.forEach((lbl, i) => { if (labelTexts[i]) lbl.textContent = labelTexts[i]; });
+
+    const tt = document.getElementById('trans-text');
+    if (tt) tt.placeholder = P.transText;
+
+    const transFromSel = document.getElementById('trans-from');
+    if (transFromSel) transFromSel.innerHTML = `<option value="ar">${L.ar}</option><option value="en">${L.en}</option><option value="fr">${L.fr}</option><option value="auto">${L.auto}</option>`;
+    const transToSel = document.getElementById('trans-to');
+    if (transToSel) transToSel.innerHTML = `<option value="en">${L.en}</option><option value="ar">${L.ar}</option><option value="fr">${L.fr}</option>`;
+    const transTypeSel = document.getElementById('trans-type');
+    if (transTypeSel) transTypeSel.innerHTML = `<option value="general">${L.general}</option><option value="business">${L.business}</option><option value="marketing">${L.marketing}</option><option value="cv">${L.cv_type}</option><option value="social">${L.social_type}</option>`;
+    const transToneSel = document.getElementById('trans-tone');
+    if (transToneSel) transToneSel.innerHTML = `<option value="formal">${L.formal}</option><option value="friendly">${L.friendly}</option><option value="simple">${L.simple}</option>`;
+  }
+}
+</script>
+HTMLEOF
+echo "done"
